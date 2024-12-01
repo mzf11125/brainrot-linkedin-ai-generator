@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, MessageCircle, Heart, Brain } from "lucide-react";
+import { ThumbsUp, MessageCircle, Heart } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -48,7 +48,6 @@ const BrainrotLinkedIn = () => {
 
     try {
       const response = await makeCohereChatRequest(prompt);
-
       setPost(response);
       setShowConfetti(true);
     } catch (error) {
@@ -58,13 +57,7 @@ const BrainrotLinkedIn = () => {
     }
   };
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-  const debouncedGeneratePost = useCallback(debounce(generatePost, 300), [
-    description,
-    includeEmojis,
-    formalityLevel,
-    postLength,
-  ]);
+  const debouncedGeneratePost = useCallback(debounce(generatePost, 300), []);
 
   const shareOnLinkedIn = () => {
     const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?text=${encodeURIComponent(
@@ -72,6 +65,26 @@ const BrainrotLinkedIn = () => {
     )}`;
     window.open(linkedInShareUrl, "_blank");
   };
+
+  const formalityDescription = useMemo(() => {
+    if (formalityLevel <= 25) return "Maximum Brainrot";
+    if (formalityLevel <= 50) return "Casual Vibes";
+    if (formalityLevel <= 75) return "Semi-Professional";
+    return "LinkedIn Professional";
+  }, [formalityLevel]);
+
+  const userRole = useMemo(() => {
+    if (formalityLevel > 75) return "Strategic Innovation Leader";
+    if (formalityLevel > 50) return "Digital Transformation Specialist";
+    if (formalityLevel > 25) return "Chief Rizz Officer";
+    return "Professional Skibidi Consultant";
+  }, [formalityLevel]);
+
+  const userTagline = useMemo(() => {
+    return formalityLevel > 50
+      ? "Web3 Innovation Strategist | Thought Leader"
+      : "Professional Gyatt Consultant | Sigma Grindset Coach";
+  }, [formalityLevel]);
 
   return (
     <div className="relative max-w-2xl mx-auto p-4 space-y-4 overflow-x-hidden">
@@ -145,13 +158,7 @@ const BrainrotLinkedIn = () => {
                 className="my-2"
               />
               <div className="text-sm text-gray-500">
-                {formalityLevel <= 25
-                  ? "Maximum Brainrot"
-                  : formalityLevel <= 50
-                  ? "Casual Vibes"
-                  : formalityLevel <= 75
-                  ? "Semi-Professional"
-                  : "LinkedIn Professional"}
+                {formalityDescription}
               </div>
             </div>
 
@@ -185,20 +192,8 @@ const BrainrotLinkedIn = () => {
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-12 h-12 bg-gray-300 rounded-full" />
                   <div>
-                    <div className="font-bold">
-                      {formalityLevel > 75
-                        ? "Strategic Innovation Leader"
-                        : formalityLevel > 50
-                        ? "Digital Transformation Specialist"
-                        : formalityLevel > 25
-                        ? "Chief Rizz Officer"
-                        : "Professional Skibidi Consultant"}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {formalityLevel > 50
-                        ? "Web3 Innovation Strategist | Thought Leader"
-                        : "Professional Gyatt Consultant | Sigma Grindset Coach"}
-                    </div>
+                    <div className="font-bold">{userRole}</div>
+                    <div className="text-sm text-gray-600">{userTagline}</div>
                   </div>
                 </div>
                 <div className="whitespace-pre-wrap">{post}</div>
