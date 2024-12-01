@@ -8,7 +8,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { makeCohereChatRequest } from "./api/newApi";
+import { makeCohereChatRequest } from "./api/Api";
 import Image from "next/image";
 
 const BrainrotLinkedIn = () => {
