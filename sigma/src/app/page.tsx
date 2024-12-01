@@ -8,32 +8,44 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { makeCohereChatRequest } from "./api/Api";
+import { makeCohereChatRequest } from "./api/api";
 import Image from "next/image";
+import Confetti from "react-confetti";
+import { useWindowSize } from "react-use";
+import Particles from "react-tsparticles";
+import { loadFull } from "tsparticles";
 
 const BrainrotLinkedIn = () => {
   const [post, setPost] = useState("");
-  const [postLength, setPostLength] = useState(50); // Change to words
+  const [postLength, setPostLength] = useState(50);
   const [includeEmojis, setIncludeEmojis] = useState(true);
   const [formalityLevel, setFormalityLevel] = useState(50);
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const { width, height } = useWindowSize();
 
   const generatePost = async () => {
     setLoading(true);
-    //const glossaryString = JSON.stringify(brainrotGlossary, null, 2); // Format the glossary JSON as a string
+    setShowConfetti(false);
+
+    const randomWords = ["Skibidi", "Sigma", "Rizz", "Gyatt", "Based"];
+    const randomWord =
+      randomWords[Math.floor(Math.random() * randomWords.length)];
 
     const prompt = `
       Generate a LinkedIn post based on the following description: ${description}. 
       Include emojis: ${includeEmojis}. 
       Formality level: ${formalityLevel}. 
       Keep the post around ${postLength} words long. Ensure the post is as close to ${postLength} words as possible.
+      Add a random word: ${randomWord}.
     `;
 
     try {
       const response = await makeCohereChatRequest(prompt);
 
       setPost(response);
+      setShowConfetti(true);
     } catch (error) {
       console.error("Error generating post:", error);
     } finally {
@@ -48,9 +60,111 @@ const BrainrotLinkedIn = () => {
     window.open(linkedInShareUrl, "_blank");
   };
 
+  const particlesInit = async (main) => {
+    await loadFull(main);
+  };
+
+  const particlesOptions = {
+    background: {
+      color: {
+        value: "#ffffff",
+      },
+    },
+    fpsLimit: 60,
+    interactivity: {
+      events: {
+        onClick: {
+          enable: true,
+          mode: "push",
+        },
+        onHover: {
+          enable: true,
+          mode: "repulse",
+        },
+        resize: true,
+      },
+      modes: {
+        push: {
+          quantity: 4,
+        },
+        repulse: {
+          distance: 200,
+          duration: 0.4,
+        },
+      },
+    },
+    particles: {
+      color: {
+        value: "#000000",
+      },
+      links: {
+        color: "#000000",
+        distance: 150,
+        enable: true,
+        opacity: 0.5,
+        width: 1,
+      },
+      collisions: {
+        enable: true,
+      },
+      move: {
+        direction: "none",
+        enable: true,
+        outModes: {
+          default: "bounce",
+        },
+        random: false,
+        speed: 2,
+        straight: false,
+      },
+      number: {
+        density: {
+          enable: true,
+          area: 800,
+        },
+        value: 80,
+      },
+      opacity: {
+        value: 0.5,
+      },
+      shape: {
+        type: "circle",
+      },
+      size: {
+        value: { min: 1, max: 5 },
+      },
+    },
+    detectRetina: true,
+  };
+
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-4">
-      <Card className="bg-white">
+    <div className="relative max-w-2xl mx-auto p-4 space-y-4 overflow-x-hidden">
+      <div className="absolute inset-0 z-0">
+        <div
+          className="tenor-gif-embed"
+          data-postid="5247155368222868243"
+          data-share-method="host"
+          data-aspect-ratio="1"
+          data-width="100%"
+        >
+          <a href="https://tenor.com/view/funny-gif-5247155368222868243">
+            Funny GIF
+          </a>
+          from <a href="https://tenor.com/search/funny-gifs">Funny GIFs</a>
+        </div>
+        <script type="text/javascript" async src="https://tenor.com/embed.js" />
+      </div>
+      {showConfetti && (
+        <div className="fixed inset-0 z-10 pointer-events-none">
+          <Confetti width={width} height={height} />
+        </div>
+      )}
+      <Particles
+        id="tsparticles"
+        init={particlesInit}
+        options={particlesOptions}
+      />
+      <Card className="bg-white relative z-20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Image src="/logo.png" alt="Logo" width={24} height={24} />
