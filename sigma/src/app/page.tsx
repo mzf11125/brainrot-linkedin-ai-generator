@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, MessageCircle, Heart, Brain } from "lucide-react";
@@ -13,6 +13,7 @@ import Image from "next/image";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 import ReactPlayer from "react-player";
+import debounce from "lodash.debounce";
 
 const BrainrotLinkedIn = () => {
   const [post, setPost] = useState("");
@@ -23,10 +24,10 @@ const BrainrotLinkedIn = () => {
   const [loading, setLoading] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const { width, height } = useWindowSize();
-  const [isClient, setIsClient] = useState(false); // Track client-side rendering
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true); // Set to true once the component has mounted
+    setIsClient(true);
   }, []);
 
   const generatePost = async () => {
@@ -37,7 +38,13 @@ const BrainrotLinkedIn = () => {
     const randomWord =
       randomWords[Math.floor(Math.random() * randomWords.length)];
 
-    const prompt = `Generate a LinkedIn post based on the following description: ${description}. Include emojis: ${includeEmojis}. Formality level: ${formalityLevel}. Keep the post around ${postLength} words long. Ensure the post is as close to ${postLength} words as possible. Add a random word: ${randomWord}.`;
+    const prompt = `
+      Generate a LinkedIn post based on the following description: ${description}. 
+      Include emojis: ${includeEmojis}. 
+      Formality level: ${formalityLevel}. 
+      Keep the post around ${postLength} words long. Ensure the post is as close to ${postLength} words as possible.
+      Add a random word: ${randomWord}.
+    `;
 
     try {
       const response = await makeCohereChatRequest(prompt);
@@ -51,6 +58,14 @@ const BrainrotLinkedIn = () => {
     }
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  const debouncedGeneratePost = useCallback(debounce(generatePost, 300), [
+    description,
+    includeEmojis,
+    formalityLevel,
+    postLength,
+  ]);
+
   const shareOnLinkedIn = () => {
     const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?text=${encodeURIComponent(
       post
@@ -60,25 +75,21 @@ const BrainrotLinkedIn = () => {
 
   return (
     <div className="relative max-w-2xl mx-auto p-4 space-y-4 overflow-x-hidden">
-      {/* Only render the GIF and confetti on the client */}
+      <div className="fixed inset-0 z-0">
+        <Image
+          src="/funny.gif"
+          alt="Funny GIF"
+          layout="fill"
+          objectFit="cover"
+        />
+      </div>
       {isClient && (
         <>
-          <div className="fixed inset-0 z-0">
-            <Image
-              src="/funny.gif"
-              alt="Funny GIF"
-              layout="fill"
-              objectFit="cover"
-              priority
-            />
-          </div>
-
           {showConfetti && (
-            <div className="fixed inset-0 z-20 pointer-events-none">
+            <div className="fixed inset-0 z-10 pointer-events-none">
               <Confetti width={width} height={height} />
             </div>
           )}
-
           <ReactPlayer
             url="https://www.youtube.com/watch?v=1kHtVjvMuFg"
             playing
@@ -91,8 +102,7 @@ const BrainrotLinkedIn = () => {
           />
         </>
       )}
-
-      <Card className="bg-white relative z-30">
+      <Card className="bg-white relative z-20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Image src="/logo.png" alt="Logo" width={24} height={24} />
@@ -155,7 +165,7 @@ const BrainrotLinkedIn = () => {
             </div>
 
             <Button
-              onClick={generatePost}
+              onClick={debouncedGeneratePost}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2"
               disabled={loading}
             >
@@ -187,29 +197,32 @@ const BrainrotLinkedIn = () => {
                     <div className="text-sm text-gray-600">
                       {formalityLevel > 50
                         ? "Web3 Innovation Strategist | Thought Leader"
-                        : "Certified Professional Brainrot Enthusiast"}
+                        : "Professional Gyatt Consultant | Sigma Grindset Coach"}
                     </div>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <p>{post}</p>
-                </div>
-                <div className="flex justify-between items-center pt-4">
-                  <div className="flex gap-4 text-gray-600">
-                    <ThumbsUp />
-                    <MessageCircle />
-                    <Heart />
-                    <Brain />
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="text-sm"
-                    onClick={shareOnLinkedIn}
-                  >
-                    Share on LinkedIn
-                  </Button>
+                <div className="whitespace-pre-wrap">{post}</div>
+                <div className="flex gap-4 mt-4 text-gray-600">
+                  <button className="flex items-center gap-1" type="button">
+                    <ThumbsUp className="w-4 h-4" />
+                    {formalityLevel > 50 ? "Like" : "Be Based"}
+                  </button>
+                  <button className="flex items-center gap-1" type="button">
+                    <MessageCircle className="w-4 h-4" />
+                    {formalityLevel > 50 ? "Comment" : "Drop W"}
+                  </button>
+                  <button className="flex items-center gap-1" type="button">
+                    <Heart className="w-4 h-4" />
+                    {formalityLevel > 50 ? "Share" : "Show Rizz"}
+                  </button>
                 </div>
               </Card>
+              <Button
+                onClick={shareOnLinkedIn}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2"
+              >
+                Share on LinkedIn
+              </Button>
             </div>
           )}
         </CardContent>
