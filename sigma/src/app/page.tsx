@@ -99,9 +99,7 @@ const BrainrotLinkedIn = () => {
       : "Professional Gyatt Consultant | Sigma Grindset Coach";
   }, [formalityLevel]);
 
-  interface CursorMadnessEvent extends MouseEvent {}
-
-  const cursorMadness = useCallback((e: CursorMadnessEvent) => {
+  const cursorMadness = useCallback((e: MouseEvent) => {
     const emoji = document.createElement("div");
     emoji.innerText = "🔥";
     emoji.className = "absolute text-2xl pointer-events-none";
