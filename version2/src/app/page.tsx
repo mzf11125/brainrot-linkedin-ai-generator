@@ -125,7 +125,7 @@ const BrainrotLinkedIn = () => {
     <div className="relative max-w-2xl mx-auto p-4 space-y-4 overflow-x-hidden">
       <div className="fixed inset-0 z-0">
         <Image
-          src="/funny.gif"
+          src="/skibidi.webp"
           alt="Funny GIF"
           layout="fill"
           objectFit="cover"

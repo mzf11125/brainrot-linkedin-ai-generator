@@ -1,5 +1,5 @@
 {
-  "name": "sigma",
+  "name": "version2",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,7 +15,6 @@
     "@radix-ui/react-switch": "^1.1.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cohere-ai": "^7.14.0",
     "dotenv": "^16.4.5",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.462.0",
